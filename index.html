@@ -10,10 +10,24 @@
 </head>
 
 <body class="d-flex flex-column">
-  <div class="row">
-    <div class="col">test</div>
-    <div class="col">test</div>
-  </div>
+  <header class="navbar-expand-lg p-4 mb-2 bg-primary">
+    <div class="container-fluid">
+      <h1 class="navbar-brand text-white fs-1">Weather Dashboard</h1>
+    </div>   
+  </header>
+  <div class="container-fluid"></div>
+    <div class="row p-3">
+      <div class="col-lg-3 bg-secondary p-2 rounded">
+      <form>
+        <fieldset enabled>
+            <legend class="text-white">Search</legend>
+            <input type="text" id="searchInput" class="form-control" placeholder="Enter city name"> 
+            <button type="submit" class="btn btn-primary">Submit</button>            
+          </fieldset>
+        </form>
+      </div>
+      <div class="col-lg-9 border rounded">results</div>
+    </div>
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
   <script src=".//assets/script.js"></script>
 </body>
