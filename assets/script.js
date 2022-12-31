@@ -56,16 +56,18 @@ var displayForecast = function (data) {
   var forecastDiv = $('<div>').addClass('row');
   var timeZone = data.city.timezone;
   console.log(timeZone)
-  for (let i = 0; i < data.list.length - 34; i++) {
-    var time = (data.list[i].dt);
-    console.log(time)
+  for (let i = 1; i < data.list.length - 34; i++) {
+    var unix = (data.list[i].dt);
+    console.log(unix)
     var icon = (data.list[i].weather[0].icon);
 
     var forecastTime = $('<h5>').addClass('card-title p-2');
     var forecastCard = $('<div>').addClass('card col');
     var forecastImg = $('<img>').addClass('col card-img-top');
     
-    forecastTime.text(time + timeZone);
+    var time = new Date((unix + timeZone) * 1000)
+    console.log(time);
+    forecastTime.text(time.toLocaleString());
     forecastImg.attr('src', 'http://openweathermap.org/img/wn/' + icon + '@2x.png');
 
     forecastCard
