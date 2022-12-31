@@ -3,16 +3,15 @@ var weatherApi = "api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&a
 var geoCoding = "http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid=" + key;
 
 var displayWeather = function (data, loc) {
-  console.log(data);
-  var city = (data.name + ', '+ loc);
+  var city = (data.name + ', ' + loc);
   var icon = (data.weather[0].icon);
   var temp = (data.main.temp);
-  var feelsLike= (data.main.feels_like);
+  var feelsLike = (data.main.feels_like);
   var humidity = (data.main.humidity);
   var wind = (data.wind.speed);
   var description = (data.weather[0].description);
   // description = description.substr(0,1).toUpperCase()+description.substr(1);
-  
+
 
 
   // var timeOffset = (data.timezone);
@@ -34,32 +33,58 @@ var displayWeather = function (data, loc) {
   weatherWind.text('Wind Speed: ' + wind + 'mph');
 
   weatherList
-  .append(weatherHumidity)
-  .append(weatherWind);
+    .append(weatherHumidity)
+    .append(weatherWind);
 
   weatherInfo
-  .append(weatherCity)
-  .append(weatherDescription)
-  .append(weatherList);
+    .append(weatherCity)
+    .append(weatherDescription)
+    .append(weatherList);
 
   weatherDiv
-  .append(weatherImg)
-  .append(weatherInfo);
-  
+    .append(weatherImg)
+    .append(weatherInfo);
+
   weatherCard
-  .append(weatherDiv)
-  
+    .append(weatherDiv);
+
   $('#weather-card').append(weatherCard);
+}
+
+var displayForecast = function (data) {
+  console.log(data);
+  var forecastDiv = $('<div>').addClass('row');
+  var timeZone = data.city.timezone;
+  console.log(timeZone)
+  for (let i = 0; i < data.list.length - 34; i++) {
+    var time = (data.list[i].dt);
+    console.log(time)
+    var icon = (data.list[i].weather[0].icon);
+
+    var forecastTime = $('<h5>').addClass('card-title p-2');
+    var forecastCard = $('<div>').addClass('card col');
+    var forecastImg = $('<img>').addClass('col card-img-top');
+    
+    forecastTime.text(time + timeZone);
+    forecastImg.attr('src', 'http://openweathermap.org/img/wn/' + icon + '@2x.png');
+
+    forecastCard
+    .append(forecastTime)
+    .append(forecastImg);
+    forecastDiv.append(forecastCard);
+  }
+  
+  $('#forecast-card').append(forecastDiv);
 }
 
 var getWeather = function (data) {
   var lat = (data[0].lat);
   var lon = (data[0].lon);
-  var loc = (data[0].state)
+  var loc = (data[0].state);
   var weather = "https://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&appid=" + key + "&units=imperial";
   fetch(weather)
-  .then(function (response) {
-    return response.json();
+    .then(function (response) {
+      return response.json();
     })
     .then(function (data) {
       displayWeather(data, loc);
@@ -67,43 +92,42 @@ var getWeather = function (data) {
     .catch(function (error) {
       console.log(error);
     })
-  }
-  var getForecast = function (data) {
-    var lat = (data[0].lat);
-    var lon = (data[0].lon);
-    var forecast = "https://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&appid=" + key + "&units=imperial";
-    fetch(forecast)
+}
+var getForecast = function (data) {
+  var lat = (data[0].lat);
+  var lon = (data[0].lon);
+  var forecast = "https://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&appid=" + key + "&units=imperial";
+  fetch(forecast)
     .then(function (response) {
       return response.json();
     })
     .then(function (data) {
-      console.log(data);
+      displayForecast(data);
     })
     .catch(function (error) {
       console.log(error);
     })
-  }
-  var getCoordinates = function (q) {
-    var locationUrl = "https://api.openweathermap.org/geo/1.0/direct?q=" + q + "&appid=" + key;
-    fetch(locationUrl)
+}
+var getCoordinates = function (q) {
+  var locationUrl = "https://api.openweathermap.org/geo/1.0/direct?q=" + q + "&appid=" + key;
+  fetch(locationUrl)
     .then(function (response) {
       return response.json();
     })
     .then(function (data) {
-      console.log(data);
       getWeather(data);
       getForecast(data);
     })
     .catch(function (error) {
       console.log(error);
     })
-  }
-  
-  // Search Button
-  $(document).on('click', '.btn-primary', function (event) {
-    event.preventDefault();
-    var q = $("#searchInput").val();
-    getCoordinates(q);
-  });
+}
 
-  getCoordinates("charlotte");
+// Search Button
+$(document).on('click', '.btn-primary', function (event) {
+  event.preventDefault();
+  var q = $("#searchInput").val();
+  getCoordinates(q);
+});
+
+getCoordinates("charlotte");
