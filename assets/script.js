@@ -2,7 +2,46 @@ var key = "ac74bca302ee441e90b0b98a1190e465"
 var weatherApi = "api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid=" + key;
 var geoCoding = "http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid=" + key;
 
+var storageRem = function (lat, lon) {
+  var getSearches = localStorage.getItem("cities") || '[]';
+  searchItems = JSON.parse(getSearches);
+  var index = searchItems.indexOf(lat + " " + lon);
+  if (index > -1) {
+    searchItems.splice(index, 1);
+    localStorage.setItem("cities", JSON.stringify(searchItems));
+  }
+  console.log(savedSearches);
+}
+
+var storageCheck = function (searchItems, newCity) {
+  var noMatch = 0
+  Object.values(searchItems).forEach(val => {
+    if (val === newCity) {
+      return;
+    } else {
+      return noMatch++;
+    }
+  })
+  if (noMatch >= searchItems.length) {
+    searchItems.push(newCity);
+    localStorage.setItem("cities", JSON.stringify(searchItems));
+  }
+};
+
+var storageAdd = function (lat, lon) {
+  var getSearches = localStorage.getItem("cities") || '[]';
+  var searchItems = JSON.parse(getSearches);
+  var newCity = (lat + " " + lon);
+  if (searchItems.length > 0) {
+    storageCheck(searchItems, newCity);
+  } else {
+    searchItems.push(newCity);
+    localStorage.setItem("cities", JSON.stringify(searchItems));
+  }
+}
+
 var displayWeather = function (data, loc) {
+  $('#weather-card').empty();
   var city = (data.name + ', ' + loc);
   var icon = (data.weather[0].icon);
   var temp = (data.main.temp);
@@ -52,30 +91,29 @@ var displayWeather = function (data, loc) {
 }
 
 var displayForecast = function (data) {
-  console.log(data);
+  $('#forecast-card').empty();
   var forecastDiv = $('<div>').addClass('row');
   var timeZone = data.city.timezone;
   console.log(timeZone)
-  for (let i = 1; i < data.list.length - 34; i++) {
+  for (let i = 0; i < data.list.length - 34; i++) {
     var unix = (data.list[i].dt);
-    console.log(unix)
     var icon = (data.list[i].weather[0].icon);
 
     var forecastTime = $('<h5>').addClass('card-title p-2');
-    var forecastCard = $('<div>').addClass('card col');
+    var forecastCard = $('<div>').addClass('card col p-2');
     var forecastImg = $('<img>').addClass('col card-img-top');
-    
-    var time = new Date((unix + timeZone) * 1000)
-    console.log(time);
+
+    var time = new Date((unix) * 1000)
     forecastTime.text(time.toLocaleString());
     forecastImg.attr('src', 'http://openweathermap.org/img/wn/' + icon + '@2x.png');
 
     forecastCard
-    .append(forecastTime)
-    .append(forecastImg);
+      .append(forecastTime)
+      .append(forecastImg);
     forecastDiv.append(forecastCard);
+
   }
-  
+
   $('#forecast-card').append(forecastDiv);
 }
 
@@ -90,6 +128,7 @@ var getWeather = function (data) {
     })
     .then(function (data) {
       displayWeather(data, loc);
+      storageAdd(lat, lon);
     })
     .catch(function (error) {
       console.log(error);
@@ -132,4 +171,4 @@ $(document).on('click', '.btn-primary', function (event) {
   getCoordinates(q);
 });
 
-getCoordinates("charlotte");
+// getCoordinates("london");
