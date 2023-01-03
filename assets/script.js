@@ -157,12 +157,12 @@ var getCoordinates = function (q) {
 
 var displaySearch = function (data) {
   var city = (data.name);
-  var temp = (data.main.temp);  
+  var temp = (data.main.temp);
   var searchCity = $('<button>').addClass('btn btn-primary border');
   var searchTemp = $('<span>').addClass('badge text-bg-secondary');
   searchCity.attr('id', city)
   searchCity.text(city);
-  searchTemp.text(temp);
+  searchTemp.text(temp + '\u00B0');
 
   searchCity.append(searchTemp);
 
@@ -187,20 +187,8 @@ var fetchSearch = function () {
       .catch(function (error) {
         console.log(error);
       })
-
-
-
-    // var data = {
-    //   0: {
-    //     lat: latlon[0],
-    //     lon: latlon[1]
-    //   }
-    // };
-
   })
 }
-
-fetchSearch();
 
 // Search Button
 $(document).on('click', '.btn-primary', function (event) {
@@ -213,4 +201,5 @@ $(document).on('click', '.btn-primary', function (event) {
   getCoordinates(q);
 });
 
+fetchSearch();
 // getCoordinates("london");
