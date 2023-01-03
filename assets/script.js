@@ -49,11 +49,6 @@ var displayWeather = function (data, loc) {
   var humidity = (data.main.humidity);
   var wind = (data.wind.speed);
   var description = (data.weather[0].description);
-  // description = description.substr(0,1).toUpperCase()+description.substr(1);
-
-
-
-  // var timeOffset = (data.timezone);
 
   var weatherCard = $('<div>').addClass('card');
   var weatherDiv = $('<div>').addClass('row');
@@ -93,8 +88,6 @@ var displayWeather = function (data, loc) {
 var displayForecast = function (data) {
   $('#forecast-card').empty();
   var forecastDiv = $('<div>').addClass('row');
-  var timeZone = data.city.timezone;
-  console.log(timeZone)
   for (let i = 0; i < data.list.length - 34; i++) {
     var unix = (data.list[i].dt);
     var icon = (data.list[i].weather[0].icon);
@@ -111,9 +104,7 @@ var displayForecast = function (data) {
       .append(forecastTime)
       .append(forecastImg);
     forecastDiv.append(forecastCard);
-
   }
-
   $('#forecast-card').append(forecastDiv);
 }
 
@@ -164,10 +155,61 @@ var getCoordinates = function (q) {
     })
 }
 
+var displaySearch = function (data) {
+  var city = (data.name);
+  var temp = (data.main.temp);  
+  var searchCity = $('<button>').addClass('btn btn-primary border');
+  var searchTemp = $('<span>').addClass('badge text-bg-secondary');
+  searchCity.attr('id', city)
+  searchCity.text(city);
+  searchTemp.text(temp);
+
+  searchCity.append(searchTemp);
+
+  $('#search-list').append(searchCity);
+}
+
+var fetchSearch = function () {
+  var getSearches = localStorage.getItem("cities") || '[]';
+  var searchItems = JSON.parse(getSearches);
+  Object.values(searchItems).forEach(val => {
+    var latlon = val.split(" ");
+    var lat = latlon[0];
+    var lon = latlon[1];
+    var weather = "https://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&appid=" + key + "&units=imperial";
+    fetch(weather)
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (data) {
+        displaySearch(data);
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
+
+
+
+    // var data = {
+    //   0: {
+    //     lat: latlon[0],
+    //     lon: latlon[1]
+    //   }
+    // };
+
+  })
+}
+
+fetchSearch();
+
 // Search Button
 $(document).on('click', '.btn-primary', function (event) {
   event.preventDefault();
-  var q = $("#searchInput").val();
+  if ($(this).attr('id')) {
+    var q = $(this).attr('id');
+  } else {
+    var q = $("#searchInput").val();
+  }
   getCoordinates(q);
 });
 
