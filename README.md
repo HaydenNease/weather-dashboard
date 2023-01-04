@@ -15,6 +15,7 @@ N/A
 
 ## Usage
 Enter a city's name into the search bar and hit enter. When you return to the page, that search will be stored and you can click on the button to return to its weather results page.
+![screenshot](./assets/screenshot.png)
 
 ## Credits
 N/A
