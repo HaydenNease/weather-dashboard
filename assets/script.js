@@ -2,17 +2,7 @@ var key = "ac74bca302ee441e90b0b98a1190e465"
 var weatherApi = "api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid=" + key;
 var geoCoding = "http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid=" + key;
 
-var storageRem = function (lat, lon) {
-  var getSearches = localStorage.getItem("cities") || '[]';
-  searchItems = JSON.parse(getSearches);
-  var index = searchItems.indexOf(lat + " " + lon);
-  if (index > -1) {
-    searchItems.splice(index, 1);
-    localStorage.setItem("cities", JSON.stringify(searchItems));
-  }
-  console.log(savedSearches);
-}
-
+// checks if the city already exists in local storage
 var storageCheck = function (searchItems, newCity) {
   var noMatch = 0
   Object.values(searchItems).forEach(val => {
@@ -28,6 +18,7 @@ var storageCheck = function (searchItems, newCity) {
   }
 };
 
+// adds city to local storage
 var storageAdd = function (lat, lon) {
   var getSearches = localStorage.getItem("cities") || '[]';
   var searchItems = JSON.parse(getSearches);
@@ -40,6 +31,7 @@ var storageAdd = function (lat, lon) {
   }
 }
 
+// displays current weather card
 var displayWeather = function (data, loc) {
   $('#weather-card').empty();
   var city = (data.name + ', ' + loc);
@@ -85,29 +77,37 @@ var displayWeather = function (data, loc) {
   $('#weather-card').append(weatherCard);
 }
 
+// displays the forecast cards
 var displayForecast = function (data) {
   $('#forecast-card').empty();
   var forecastDiv = $('<div>').addClass('row');
   for (let i = 0; i < data.list.length - 34; i++) {
+    console.log(data);
     var unix = (data.list[i].dt);
     var icon = (data.list[i].weather[0].icon);
+    var temp = (data.list[i].main.temp)
 
     var forecastTime = $('<h5>').addClass('card-title p-2');
-    var forecastCard = $('<div>').addClass('card col p-2');
+    var forecastCard = $('<div>').addClass('card col-lg-2 col-xs-auto p-2');
     var forecastImg = $('<img>').addClass('col card-img-top');
+    var forecastDescription = $('<p>').addClass('card-text p-3');
 
     var time = new Date((unix) * 1000)
     forecastTime.text(time.toLocaleString());
     forecastImg.attr('src', 'http://openweathermap.org/img/wn/' + icon + '@2x.png');
+    forecastDescription.text(temp + '\u00B0');
 
     forecastCard
       .append(forecastTime)
-      .append(forecastImg);
+      .append(forecastImg)
+      .append(forecastDescription);
+
     forecastDiv.append(forecastCard);
   }
   $('#forecast-card').append(forecastDiv);
 }
 
+// fetches current weather
 var getWeather = function (data) {
   var lat = (data[0].lat);
   var lon = (data[0].lon);
@@ -125,6 +125,8 @@ var getWeather = function (data) {
       console.log(error);
     })
 }
+
+// fetches forecast
 var getForecast = function (data) {
   var lat = (data[0].lat);
   var lon = (data[0].lon);
@@ -140,6 +142,7 @@ var getForecast = function (data) {
       console.log(error);
     })
 }
+// fetch converts search to coordinates
 var getCoordinates = function (q) {
   var locationUrl = "https://api.openweathermap.org/geo/1.0/direct?q=" + q + "&appid=" + key;
   fetch(locationUrl)
@@ -155,6 +158,7 @@ var getCoordinates = function (q) {
     })
 }
 
+// displays the cities saved in local storage with temp
 var displaySearch = function (data) {
   var city = (data.name);
   var temp = (data.main.temp);
@@ -169,6 +173,7 @@ var displaySearch = function (data) {
   $('#search-list').append(searchCity);
 }
 
+// fetches current weather info for cities saved in local storage
 var fetchSearch = function () {
   var getSearches = localStorage.getItem("cities") || '[]';
   var searchItems = JSON.parse(getSearches);
@@ -190,7 +195,7 @@ var fetchSearch = function () {
   })
 }
 
-// Search Button
+// Search Buttons
 $(document).on('click', '.btn-primary', function (event) {
   event.preventDefault();
   if ($(this).attr('id')) {
@@ -202,4 +207,3 @@ $(document).on('click', '.btn-primary', function (event) {
 });
 
 fetchSearch();
-// getCoordinates("london");
